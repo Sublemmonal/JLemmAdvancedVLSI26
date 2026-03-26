@@ -5,8 +5,24 @@
 clear; clf; close all;
 
 %% Variable and filter setup
-n = 330;
-f = [0 0.2 0.23 1];
-A = [1 1 0 0];
+ntap = 330;
+ftap = [0 0.2 0.23 1];
+Atap = [1 1 0 0];
 
-tapspm = firpm(n,f,A);
+taps = firpm(ntap,ftap,Atap);
+freqz(taps,1,512)
+
+%% Filter taps scaling
+% Since the filter taps are all decimals, we can scale the taps by some 
+% factor, truncate, and then divide the output by said factor after
+% performing the FIR operation
+
+scale = 2^16;
+bits = 16;
+
+tapsb = strcat('0b',dec2bin(taps*scale,bits),'s',string(bits));
+
+tapsb2d = bin2dec(tapsb)/scale;
+
+figure
+freqz(tapsb2d,1,512)
